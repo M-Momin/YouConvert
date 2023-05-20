@@ -37,23 +37,32 @@ def Download(line):
     print("System found " + str(number) + " musics.\n" )
     print("Dowloading...\n")
     for url in playlist:
-        author = YouTube(url).author
-        title = YouTube(url).title
-        splitAuthor = author.split(' - ')[0]
+    	try:
+    		author = YouTube(url).author
+    		title = YouTube(url).title
+    		splitAuthor = author.split(' - ')[0]
 
+    		print("\nMusic : " + str(splitAuthor) + " - " + str(title))
+    		if os.path.exists(SAVE_PATH + "/" + str(splitAuthor)+ ' - ' + str(title)+'.mp3') == False:
+	    		YouTube(url).streams.filter(only_audio=True).first().download(SAVE_PATH)
 
-        print("Music : " + str(splitAuthor) + " - " + str(title))
+	    		for file in os.listdir(folder):
+	    			if re.search('mp4', file):
+	    				mp4_path = os.path.join(folder,file)
+	    				mp3_path = os.path.join(folder,str(splitAuthor)+ ' - ' + str(title)+'.mp3')
+	    				new_file = mp.AudioFileClip(mp4_path)
+	    				new_file.write_audiofile(mp3_path)
+	    				os.remove(mp4_path)
+	    	else:
+	    		print("The music already exists !")
+    	except:
+    		print("A problem occurred for : " + str(YouTube(url).title)) 
+    		try:
+    			os.remove(mp4_path)
+    		except:
+    			print("An error occured !")
 
-        YouTube(url).streams.filter(only_audio=True).first().download(SAVE_PATH)
-
-
-        for file in os.listdir(folder):
-            if re.search('mp4', file):
-                mp4_path = os.path.join(folder,file)
-                mp3_path = os.path.join(folder,str(splitAuthor)+ ' - ' + str(title)+'.mp3')
-                new_file = mp.AudioFileClip(mp4_path)
-                new_file.write_audiofile(mp3_path)
-                os.remove(mp4_path)
+ 
 
 
 def run():
